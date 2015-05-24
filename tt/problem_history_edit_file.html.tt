@@ -20,6 +20,14 @@
     [% END %]
 </div>
 <div class="page_body">
+    <form action="[% href_current_link %]" method="post">
+      <select name="enc">
+        [% FOREACH source_encodings %]
+          <option value="[% enc %]"[% IF selected %] selected="selected"[% END %]>[% enc %]</option>
+        [% END %]
+      </select>
+      <input type="submit" class="button" value="[% capt.enc %]" />
+    </form>
     <form method="post" accept-charset="UTF-8" style="margin: 0">
         <div>
             <textarea rows="40" cols="100" name="source">[% IF content; content; ELSE %][% FOREACH line IN blob.lines %]

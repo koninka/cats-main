@@ -11,7 +11,7 @@ use CATS::Misc qw(
     $t $is_jury $is_root $is_team $sid $cid $uid $contest $is_virtual $virtual_diff_time
     cats_dir init_template init_listview_template msg res_str url_f auto_ext
     order_by sort_listview define_columns attach_listview problem_status_names);
-use CATS::Utils qw(url_function file_type date_to_iso encoding_param);
+use CATS::Utils qw(url_function file_type date_to_iso encoding_param encodings);
 use CATS::Data qw(:all);
 use CATS::StaticPages;
 use CATS::Problem::Text;
@@ -916,7 +916,8 @@ sub problem_history_blob_frame
 
     init_template('problem_history_blob.html.tt');
 
-    my $blob = CATS::Problem::show_blob($pid, $hash_base, $file);
+    my $se = param('enc') || 'WINDOWS-1251';
+    my $blob = CATS::Problem::show_blob($pid, $hash_base, $file, $se);
     set_history_paths_urls($pid, $blob->{paths});
     my @items = !$blob->{is_remote} && !$blob->{image} && $blob->{latest_sha} eq $hash_base
               ? { href => url_f('problem_history', a => 'edit', file => $file, hb => $hash_base, pid => $pid), item => res_str(572) }
@@ -926,6 +927,7 @@ sub problem_history_blob_frame
     $t->param(
         blob => $blob,
         problem_title => $title,
+        source_encodings => [ map {{ enc => $_, selected => $_ eq $se }} sort keys %{encodings()} ],
     );
 }
 
@@ -953,10 +955,11 @@ sub problem_history_edit_frame
         return redirect url_f('problem_history', pid => $pid);
     }
     init_template('problem_history_edit_file.html.tt');
-
     my $content = param('source');
+    my $se = param('enc') || 'WINDOWS-1251';
     if (defined param('save')) {
         my CATS::Problem $p = CATS::Problem->new;
+        Encode::from_to($content, 'utf8', $se);
         my ($error, $latest_sha) = $p->change_file($cid, $pid, $file, $content, param('message'), param('is_amend') || 0, param('line_breaks'));
         if (!$error) {
             return redirect url_f('problem_history', a => 'commitdiff', pid => $pid, h => $latest_sha);
@@ -964,20 +967,20 @@ sub problem_history_edit_frame
             msg(1008);
         }
         $t->param(
-            content => $content,
+            content => Encode::decode('utf8', param('source')),
             problem_import_log => $p->encoded_import_log()
         );
     }
 
-    my $blob = CATS::Problem::show_blob($pid, $hash_base, $file);
+    my $blob = CATS::Problem::show_blob($pid, $hash_base, $file, $se);
 
     set_submenu_for_tree_frame($pid, $hash_base);
     set_history_paths_urls($pid, $blob->{paths});
-
     $t->param(
         file => $file,
         blob => $blob,
         problem_title => $title,
+        source_encodings => [ map {{ enc => $_, selected => $_ eq $se }} sort keys %{encodings()} ],
     );
 }
 
