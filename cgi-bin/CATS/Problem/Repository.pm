@@ -22,6 +22,7 @@ use warnings;
 
 use Fcntl ':mode';
 use File::Path;
+use File::Spec;
 use File::Temp qw(tempdir tempfile);
 use File::Copy::Recursive qw(dircopy);
 
@@ -785,6 +786,8 @@ sub blob
     my $result = {
         lines => [],
         paths => $self->format_page_path($file, 'blob', $hash_base),
+        latest_sha => $self->get_latest_master_sha,
+        is_remote => $self->get_remote_url,
     };
 
     my $mimetype = blob_mimetype($fd, $file);
@@ -826,6 +829,7 @@ sub raw
     return {
         type => $mimetype,
         content => $content,
+        latest_sha => $self->get_latest_master_sha,
     };
 }
 
@@ -954,6 +958,15 @@ sub add
     my $self = shift;
     $self->git('add -A');
     return $self;
+}
+
+sub replace_file_content
+{
+    my ($self, $file, $content) = @_;
+    my $fname = File::Spec->catpath('', $self->{dir}, $file);
+    open my $fh, '>', $fname or die("Cannot open file $fname: $!");
+    print $fh $content;
+    close $fh;
 }
 
 sub move_history
