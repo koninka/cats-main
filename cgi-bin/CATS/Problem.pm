@@ -195,7 +195,7 @@ sub load
 sub change_file
 {
     my CATS::Problem $self = shift;
-    ($self->{contest_id}, $self->{id}, my $file, my $content, my $message, my $is_amend) = @_;
+    ($self->{contest_id}, $self->{id}, my $file, my $content, my $message, my $is_amend, my $crlf) = @_;
     my $repo = get_repo($self->{id});
     $repo->replace_file_content($file, $content);
 

@@ -30,6 +30,7 @@
     amend => 'исправить',
     message => 'Сообщение',
     file_editing => 'Редактирование файла',
+    line_breaks => 'Переводы строк',
   });
   MACRO to_monitor(console) BLOCK; "Для наблюдения за ходом тестирования откройте ${console}"; END;
 %]

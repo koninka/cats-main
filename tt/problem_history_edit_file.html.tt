@@ -35,6 +35,16 @@
             <input type="submit" name="save" value="[% capt.save %]" class="button" />
           </p>
         </div>
+        <div class="problem_submit">
+          <p>
+            <label for="line_breaks">[% capt.line_breaks %]:</label><br/>
+            <select id="line_breaks" name="line_breaks">
+                <option value="" selected="selected"></option>
+                <option value="lf">lf</option>
+                <option value="crlf">crlf</option>
+            </select>
+          </p>
+        </div>
     </form>
 </div>
 [% PROCESS 'includes/menu_end.tti' %]

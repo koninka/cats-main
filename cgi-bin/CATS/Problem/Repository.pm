@@ -955,7 +955,11 @@ sub rm
 
 sub add
 {
-    my $self = shift;
+    my ($self, $crlf) = @_;
+    if (defined $crlf && ($crlf =~ /crlf/ || $crlf =~ /lf/)) {
+        my $value = $crlf =~ /crlf/ ? 'true' : 'input';
+        $self->git("config core.autocrlf $value");
+    }
     $self->git('add -A');
     return $self;
 }

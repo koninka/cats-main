@@ -957,7 +957,7 @@ sub problem_history_edit_frame
     my $content = param('source');
     if (defined param('save')) {
         my CATS::Problem $p = CATS::Problem->new;
-        my ($error, $latest_sha) = $p->change_file($cid, $pid, $file, $content, param('message'), param('is_amend') || 0);
+        my ($error, $latest_sha) = $p->change_file($cid, $pid, $file, $content, param('message'), param('is_amend') || 0, param('line_breaks'));
         if (!$error) {
             return redirect url_f('problem_history', a => 'commitdiff', pid => $pid, h => $latest_sha);
         } else {
