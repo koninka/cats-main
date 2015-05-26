@@ -162,12 +162,12 @@ sub load
         $repo->reset('HEAD')->checkout;
         $dbh->rollback unless $self->{debug};
         $self->note("Import failed: $@");
-        return -1;
+        return (-1, undef);
     }
     else {
         $dbh->commit unless $self->{debug};
         $self->note('Success import');
-        return 0;
+        return (0, $repo->get_latest_master_sha);
     }
 }
 
