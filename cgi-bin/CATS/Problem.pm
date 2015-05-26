@@ -154,19 +154,18 @@ sub load
             XMLDecl => sub { $self->{encoding} = $_[2] },
         );
         $parser->parse($self->{source}->read_member($xml_members[0]));
+        $self->add_history($message, $is_amend);
     };
 
+    my $repo = get_repo($self->{id}, undef, 0);
     if ($@) {
+        $repo->reset('HEAD')->checkout;
         $dbh->rollback unless $self->{debug};
         $self->note("Import failed: $@");
         return -1;
     }
     else {
-        unless ($self->{debug}) {
-            $dbh->commit;
-            eval { $self->add_history($message, $is_amend); };
-            $self->note("Warning: $@") if $@;
-        }
+        $dbh->commit unless $self->{debug};
         $self->note('Success import');
         return 0;
     }
